@@ -3,11 +3,11 @@
 import Link from "next/link"
 import { Poppins } from "next/font/google"
 import { cn } from "@/lib/utils"
-import { ReactNode, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
-import { NavbarSidebar } from "./navbar-sidebar";
-import { MenuIcon } from "lucide-react";
+import { ReactNode, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { usePathname } from "next/navigation"
+import { NavbarSidebar } from "./navbar-sidebar"
+import { MenuIcon } from "lucide-react"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -15,9 +15,9 @@ const poppins = Poppins({
 })
 
 interface NavbarItemProps {
-  href: string;
-  children: ReactNode;
-  isActive?: boolean;
+  href: string
+  children: ReactNode
+  isActive?: boolean
 }
 
 const NavbarItem = ({ href, children, isActive }: NavbarItemProps) => {

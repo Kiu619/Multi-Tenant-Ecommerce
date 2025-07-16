@@ -1,17 +1,17 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import Link from "next/link";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { ReactNode } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area"
+import Link from "next/link"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { ReactNode } from "react"
 
 interface NavbarItem {
-  href: string;
-  children: ReactNode;
+  href: string
+  children: ReactNode
 }
 
 interface NavbarSidebarProps {
-  items: NavbarItem[];
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  items: NavbarItem[]
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export const NavbarSidebar = ({ items, isOpen, onOpenChange }: NavbarSidebarProps) => {
@@ -22,6 +22,9 @@ export const NavbarSidebar = ({ items, isOpen, onOpenChange }: NavbarSidebarProp
           <SheetTitle className="text-2xl font-semibold">
             Kiuu
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            Hidden description for accessibility
+          </SheetDescription>
         </SheetHeader>
 
         <ScrollArea className="flex flex-col overflow-y-auto h-full pb-2">
