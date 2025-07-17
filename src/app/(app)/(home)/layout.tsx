@@ -1,9 +1,9 @@
 import { getQueryClient, trpc } from "@/trpc/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import { ReactNode, Suspense } from "react"
-import { Footer } from "./footer"
-import { NavbarWrapper } from "./navbar-wrapper"
-import { SearchFilters, SearchFiltersLoading } from "./search-filters"
+import { SearchFilters, SearchFiltersLoading } from "@/modules/home/ui/components/search-filters"
+import { NavbarWrapper } from "@/modules/home/ui/components/navbar-wrapper"
+import { Footer } from "@/modules/home/ui/components/footer"
 interface Props {
   children: ReactNode
 }
