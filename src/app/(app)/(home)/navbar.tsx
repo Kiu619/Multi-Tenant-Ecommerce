@@ -1,13 +1,14 @@
 'use client'
 
-import Link from "next/link"
-import { Poppins } from "next/font/google"
-import { cn } from "@/lib/utils"
-import { ReactNode, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { usePathname } from "next/navigation"
-import { NavbarSidebar } from "./navbar-sidebar"
+import { useSession } from "@/hooks/use-session"
+import { cn } from "@/lib/utils"
 import { MenuIcon } from "lucide-react"
+import { Poppins } from "next/font/google"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { ReactNode, useState } from "react"
+import { NavbarSidebar } from "./navbar-sidebar"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -44,8 +45,9 @@ const navbarItems = [
 export const Navbar = () => {
 
   const pathname = usePathname()
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const session = useSession()
 
   return (
     <nav className="h-20 flex border-b justify-between items-center px-10 bg-white">
@@ -65,25 +67,42 @@ export const Navbar = () => {
         ))}
       </div>
 
-      <div className="lg:flex items-center gap-4 hidden">
-        <Button
-         // asChild is used to make the button a link
-         asChild
-         variant='secondary'
-         className="border-l border-t-0 border-b-0 border-r-0 px-12 h-full rounded-none bg-white hover:bg-pink-400 transition-colors text-lg">
-          <Link href="/login" className="h-full">
-            Login
-          </Link>
-        </Button>
-        <Button
-         asChild
-         variant='secondary'
-         className="border-l border-t-0 border-b-0 border-r-0 px-12 h-full rounded-none bg-black text-white hover:text-black hover:bg-pink-400 transition-colors text-lg">
-          <Link href="/start-selling">
-            Start selling
-          </Link>
-        </Button>
-      </div>
+      {session.data?.user ? (
+        <div className="lg:flex hidden">
+          <Button
+            // asChild is used to make the button a link
+            asChild
+            variant='secondary'
+            className="border-l border-t-0 border-b-0 border-r-0 px-12 h-full rounded-none bg-white hover:bg-pink-400 transition-colors text-lg">
+            <Link href="/admin" className="h-full">
+              Dashboard
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="lg:flex items-center gap-4 hidden">
+          <Button
+            // asChild is used to make the button a link
+            asChild
+            variant='secondary'
+            className="border-l border-t-0 border-b-0 border-r-0 px-12 h-full rounded-none bg-white hover:bg-pink-400 transition-colors text-lg">
+            <Link prefetch href="/sign-in" className="h-full">
+              Login
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant='secondary'
+            className="border-l border-t-0 border-b-0 border-r-0 px-12 h-full rounded-none bg-black text-white hover:text-black hover:bg-pink-400 transition-colors text-lg">
+            <Link prefetch href="/sign-up">
+              Start selling
+            </Link>
+          </Button>
+        </div>
+      )}
+
+
 
       <div className="flex lg:hidden items-center justify-center">
         <Button

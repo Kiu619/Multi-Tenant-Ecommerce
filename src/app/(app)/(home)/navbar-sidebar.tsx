@@ -1,6 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area"
-import Link from "next/link"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { useSession } from "@/hooks/use-session"
+import Link from "next/link"
 import { ReactNode } from "react"
 
 interface NavbarItem {
@@ -15,6 +16,9 @@ interface NavbarSidebarProps {
 }
 
 export const NavbarSidebar = ({ items, isOpen, onOpenChange }: NavbarSidebarProps) => {
+
+  const session = useSession()
+
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="p-0 transition-none">
@@ -37,18 +41,29 @@ export const NavbarSidebar = ({ items, isOpen, onOpenChange }: NavbarSidebarProp
             </Link>
           ))}
 
-          <div className="border-t">
-            <Link href="/login" className="flex items-center w-full text-left p-4 hover:bg-black hover:text-white text-base font-medium"
-              onClick={() => onOpenChange(false)}
-            >
-              Login
-            </Link>
-            <Link href="/start-selling" className="flex items-center w-full text-left p-4 hover:bg-black hover:text-white text-base font-medium"
-              onClick={() => onOpenChange(false)}
-            >
-              Start selling
-            </Link>
-          </div>
+          {session.data?.user ? (
+            <div className="border-t">
+              <Link href="/admin" className="flex items-center w-full text-left p-4 hover:bg-black hover:text-white text-base font-medium"
+                onClick={() => onOpenChange(false)}
+              >
+                Dashboard
+              </Link>
+            </div>
+          ) : (
+            <div className="border-t">
+              <Link href="/sign-in" className="flex items-center w-full text-left p-4 hover:bg-black hover:text-white text-base font-medium"
+                onClick={() => onOpenChange(false)}
+              >
+                Login
+              </Link>
+              <Link href="/sign-up" className="flex items-center w-full text-left p-4 hover:bg-black hover:text-white text-base font-medium"
+                onClick={() => onOpenChange(false)}
+              >
+                Start selling
+              </Link>
+            </div>
+          )}
+          
         </ScrollArea>
       </SheetContent>
     </Sheet>

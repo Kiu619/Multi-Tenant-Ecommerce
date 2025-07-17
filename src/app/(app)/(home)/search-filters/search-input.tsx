@@ -1,11 +1,13 @@
 "use client"
 
-import { ListFilterIcon, SearchIcon } from "lucide-react"
+import { BookmarkCheckIcon, ListFilterIcon, SearchIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { CategoriesSidebar } from "./categories-sidebar"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { CategoriesGetManyOutput } from "@/modules/categories/types"
+import { useSession } from "@/hooks/use-session"
+import Link from "next/link"
 interface Props {
   disabled?: boolean
   data: CategoriesGetManyOutput
@@ -13,6 +15,8 @@ interface Props {
 
 export const SearchInput = ({ disabled, data }: Props) => {
   const [isCategoriesSidebarOpen, setIsCategoriesSidebarOpen] = useState(false)
+
+  const session = useSession()
 
   return (
     <div className="flex items-center gap-2 w-full">
@@ -34,6 +38,15 @@ export const SearchInput = ({ disabled, data }: Props) => {
       >
         <ListFilterIcon className="size-4" />
       </Button>
+
+      {session.data?.user && (
+        <Button asChild variant='elevated'>
+          <Link href="/admin">
+            <BookmarkCheckIcon className="size-4" />
+            Library
+          </Link>
+        </Button>
+      )}
     </div>
   )
 }
