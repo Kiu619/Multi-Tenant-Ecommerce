@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ListFilterIcon } from "lucide-react"
 import { CategoriesSidebar } from "./categories-sidebar"
-import { CustomCategory } from "@/types"
+import { CategoriesGetManyOutput } from "@/modules/categories/types"
 
 interface Props {
-  data: CustomCategory[]
+  data: CategoriesGetManyOutput
 }
 
 export const Categories = ({ data }: Props) => {
@@ -58,7 +58,7 @@ export const Categories = ({ data }: Props) => {
 
 
   return (
-    <div className="relative w-full md:hidden lg:block">
+    <div className="relative w-full hidden lg:block">
 
       {/* Categories sidebar */}
       <CategoriesSidebar isOpen={isSidebarOpen} onOpenChange={setIsSidebarOpen} data={data} />

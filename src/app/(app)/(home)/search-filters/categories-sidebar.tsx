@@ -10,20 +10,19 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { CustomCategory } from "@/types"
-import { Category } from "@/payload-types"
+import { CategoriesGetManyOutput, Category } from "@/modules/categories/types"
 
 interface Props {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  data: CustomCategory[]
+  data: CategoriesGetManyOutput
 }
 
 export const CategoriesSidebar = ({ isOpen, onOpenChange, data }: Props) => {
   const router = useRouter()
   
-  const [parentCategories, setParentCategories] = useState<CustomCategory[] | null>(null)
-  const [activeCategory, setActiveCategory] = useState<CustomCategory | null>(null)
+  const [parentCategories, setParentCategories] = useState<CategoriesGetManyOutput | null>(null)
+  const [activeCategory, setActiveCategory] = useState<Category | null>(null)
 
   const currentCategory = parentCategories ?? data ?? []
 
@@ -36,9 +35,9 @@ export const CategoriesSidebar = ({ isOpen, onOpenChange, data }: Props) => {
     onOpenChange(open)
   }
 
-  const handleCategoryClick = (category: CustomCategory) => {
+  const handleCategoryClick = (category: Category) => {
     if (category.subcategories && category.subcategories.length > 0) {
-      setParentCategories(category.subcategories as CustomCategory[])
+      setParentCategories(category.subcategories as CategoriesGetManyOutput)
       setActiveCategory(category)
     } else {
       if (parentCategories && activeCategory) {

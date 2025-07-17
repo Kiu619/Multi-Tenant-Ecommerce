@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input"
 import { CategoriesSidebar } from "./categories-sidebar"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { CustomCategory } from "@/types"
+import { CategoriesGetManyOutput } from "@/modules/categories/types"
 interface Props {
   disabled?: boolean
-  data: CustomCategory[]
+  data: CategoriesGetManyOutput
 }
 
 export const SearchInput = ({ disabled, data }: Props) => {

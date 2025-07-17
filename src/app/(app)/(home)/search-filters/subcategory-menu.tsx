@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { CustomCategory } from "@/types"
+import { Category } from "@/modules/categories/types"
 
 interface Props {
-  category: CustomCategory
+  category: Category
   isOpen: boolean
   position: { top: number, left: number }
 }
