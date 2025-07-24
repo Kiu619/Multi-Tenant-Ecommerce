@@ -2,6 +2,7 @@
   "name": "multi-tenant_ecom",
   "version": "0.1.0",
   "private": true,
+  
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +10,9 @@
     "lint": "next lint",
     "generate:types": "payload generate:types",
     "db:fresh": "payload migrate:fresh",
-    "db:seed": "tsx src/seed.ts"
+    "db:seed": "tsx src/seed.ts",
+    "db:reset": "npm run db:fresh && npm run db:seed",
+    "generate:importmap": "payload generate:importmap"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -17,6 +20,7 @@
     "@payloadcms/next": "^3.47.0",
     "@payloadcms/payload-cloud": "^3.47.0",
     "@payloadcms/richtext-lexical": "^3.47.0",
+    "@payloadcms/plugin-multi-tenant": "^3.47.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",

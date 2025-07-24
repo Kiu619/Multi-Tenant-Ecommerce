@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server"
 import { headers as getHeaders } from "next/headers"
 import { z } from "zod"
 import { generateAuthCookie } from "../utils"
+import { registerSchema } from "../schemas"
 
 export const authRouter = createTRPCRouter({
   session: baseProcedure.query(async ({ ctx }) => {
@@ -14,71 +15,66 @@ export const authRouter = createTRPCRouter({
     return session
   }),
 
-  register: baseProcedure.input(z.object({
-    email: z.string().email(),
-    password: z.string().min(3),
-    username: z
-      .string()
-      .min(3)
-      .max(20)
-      .regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "Username can only contain lowercase letters, numbers, and hyphens")
-      .refine((username) => !username.includes(" "), "Username cannot contain spaces")
-      .refine((username) => !username.includes("."), "Username cannot contain dots")
-      .refine((username) => !username.includes("_"), "Username cannot contain underscores")
-      .refine((username) => !username.includes("-"), "Username cannot contain hyphens")
-      .refine((username) => !username.includes("!"), "Username cannot contain exclamation marks")
-      .refine((username) => !username.includes("@"), "Username cannot contain at signs")
-      .refine((username) => !username.includes("#"), "Username cannot contain hashes")
-      .refine((username) => !username.includes("$"), "Username cannot contain dollar signs")
-      .refine((username) => !username.includes("%"), "Username cannot contain percent signs")
-      .transform((username) => username.toLowerCase()),
-  })).mutation(async ({ input, ctx }) => {
-    const { email, password, username } = input
-    console.log(email, password, username)
-    const existingUser = await ctx.payload.find({
-      collection: "users",
-      where: {
-        username: {
-          equals: username,
+  register: baseProcedure
+    .input(registerSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { email, password, username } = input
+      const existingUser = await ctx.payload.find({
+        collection: "users",
+        where: {
+          username: {
+            equals: username,
+          },
         },
-      },
-      limit: 1,
-    })
-
-    console.log(existingUser)
-    if (existingUser.totalDocs > 0) {
-      throw new TRPCError({
-        code: "CONFLICT",
-        message: "Username already taken",
+        limit: 1,
       })
-    }
-    await ctx.payload.create({
-      collection: "users",
-      data: {
-        email,
-        password,
-        username,
-      },
-    })
-    const user = await ctx.payload.login({
-      collection: "users",
-      data: {
-        email,
-        password,
+
+      if (existingUser.totalDocs > 0) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Username already taken",
+        })
       }
-    })
 
-    if (!user.token) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "Invalid credentials",
+      const tenant = await ctx.payload.create({
+        collection: "tenants",
+        data: {
+          name: username,
+          slug: username,
+          stripeAccountId: "test_account_id",
+        },
       })
-    }
-    await generateAuthCookie({
-      prefix: ctx.payload.config.cookiePrefix,
-      value: user.token,
-    })
-  }),
+
+      await ctx.payload.create({
+        collection: "users",
+        data: {
+          email,
+          password,
+          username,
+          tenants: [{
+            tenant: tenant.id,
+          }],
+        },
+      })
+      const user = await ctx.payload.login({
+        collection: "users",
+        data: {
+          email,
+          password,
+        }
+      })
+
+      if (!user.token) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid credentials",
+        })
+      }
+      await generateAuthCookie({
+        prefix: ctx.payload.config.cookiePrefix,
+        value: user.token,
+      })
+    }),
 
   forgotPassword: baseProcedure.input(z.object({
     email: z.string().email(),
@@ -116,5 +112,5 @@ export const authRouter = createTRPCRouter({
       value: user.token,
     })
     return user
-  })  
+  })
 })
