@@ -8,12 +8,15 @@ import { useSuspenseInfiniteQuery } from "@tanstack/react-query"
 import { DEFAULT_LIMIT } from "@/constants"
 import { Button } from "@/components/ui/button"
 import { InboxIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface Props {
   category?: string
+  tenantSlug?: string
+  narrowView?: boolean
 }
 
-export const ProductList = ({ category }: Props) => {
+export const ProductList = ({ category, tenantSlug, narrowView }: Props) => {
 
   const [filters] = useProductFilters()
 
@@ -22,6 +25,7 @@ export const ProductList = ({ category }: Props) => {
     {
       ...filters,
       category,
+      tenantSlug,
       limit: DEFAULT_LIMIT,
     },
     {
@@ -42,44 +46,44 @@ export const ProductList = ({ category }: Props) => {
 
   return (
     <>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-      {(data as any)?.pages.flatMap((page: any) => page.docs).map((product: Product) => (
-        <ProductCard
-          key={product.id}
-          id={product.id}
-          name={product.name}
-          imageUrl={product.image?.url}
-          authorUsername={product.author?.username || 'Kiuu'}
-          authorImageUrl={product.author?.imageUrl || ''}
-          reviewRating={product?.reviewRating || 4.5}
-          reviewCount={product?.reviewCount || 100}
-          price={product?.price || 0}
-        />
-      ))}
-    </div>
+      <div className={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4", narrowView && "lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3")}>
+        {(data as any)?.pages.flatMap((page: any) => page.docs).map((product: Product) => (
+          <ProductCard
+            key={product.id}
+            id={product.id}
+            name={product.name}
+            imageUrl={product.image?.url}
+            tenantSlug={product.tenant?.slug || 'Kiuu'}
+            tenantImageUrl={product.tenant?.image?.url || ''}
+            reviewRating={product?.reviewRating || 4.5}
+            reviewCount={product?.reviewCount || 100}
+            price={product?.price || 0}
+          />
+        ))}
+      </div>
 
-    <div className="flex justify-center pt-8">
-      {hasNextPage && (
-        <Button
-          onClick={() => fetchNextPage()}
-          disabled={isFetchingNextPage}
-          className="font-medium disabled:opacity-50 text-base bg-white"
-          variant="elevated"
-        >
-          {isFetchingNextPage ? 'Loading...' : 'Load more'}
-        </Button>
-      )}
-    </div>
+      <div className="flex justify-center pt-8">
+        {hasNextPage && (
+          <Button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            className="font-medium disabled:opacity-50 text-base bg-white"
+            variant="elevated"
+          >
+            {isFetchingNextPage ? 'Loading...' : 'Load more'}
+          </Button>
+        )}
+      </div>
     </>
   )
 }
 
-export const ProductListSkeleton = () => {
+export const ProductListSkeleton = ({ narrowView }: { narrowView?: boolean }) => {
   return (
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-    {Array.from({ length: DEFAULT_LIMIT }).map((_, index) => (
-      <ProductCardSkeleton key={index} />
-    ))}
+    <div className={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4", narrowView && "lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3")}>
+      {Array.from({ length: DEFAULT_LIMIT }).map((_, index) => (
+        <ProductCardSkeleton key={index} />
+      ))}
     </div>
   )
 }
