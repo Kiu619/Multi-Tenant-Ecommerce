@@ -33,7 +33,7 @@ export const Navbar = ({ slug }: NavbarProps) => {
               className="rounded-full border shrink-0"
             />
           )}
-          <p className={cn(poppins.className, "text-2xl")}>{tenant?.name}</p>
+          <p className="text-2xl font-bold">{tenant?.name || slug}</p>
         </Link>
 
       </div>
