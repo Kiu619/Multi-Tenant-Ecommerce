@@ -5,11 +5,19 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { formatPrice, generateTenantURL } from "@/lib/utils"
 import { useTRPC } from "@/trpc/client"
-import { dataTagErrorSymbol, useSuspenseQuery } from "@tanstack/react-query"
-import { LinkIcon, MinusIcon, PlusIcon, StarIcon } from "lucide-react"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { LinkIcon, PlusIcon, StarIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { Fragment } from "react"
+// import { CartButton } from "../ui/components/cart-button"
+import dynamic from "next/dynamic"
+
+const CartButton = dynamic(() => import("../components/cart-button")
+  .then((mod) => mod.CartButton), {
+  ssr: false,
+  loading: () => <Button disabled className="flex-1 bg-pink-400">Loading...</Button>,
+})
 
 interface ProductViewProps {
   productId: string
@@ -70,14 +78,14 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
 
               <div className="hidden lg:flex px-6 py-4 items-center justify-center">
                 <div className="flex items-center gap-1">
-                  <StarRating rating={4} iconClassName="size-4"/>
+                  <StarRating rating={4} iconClassName="size-4" />
                 </div>
               </div>
             </div>
 
             <div className="block lg:hidden px-6 -py-4 items-center justify-center border-b">
               <div className="flex items-center gap-1">
-                <StarRating rating={4} iconClassName="size-4"/>
+                <StarRating rating={4} iconClassName="size-4" />
 
                 <p className="text-base font-medium">
                   {4} ratings
@@ -101,17 +109,11 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
             <div className="border-t lg:border-t-0 lg:border-l h-full">
               <div className="flex flex-col gap-4 p-6 border-b">
                 <div className="flex flex-row items-center gap-2">
-                  <Button
-                    variant="elevated"
-                    className="flex-1 bg-pink-400"
-                  >
-                    Add to cart
-                    <PlusIcon className="size-4" />
-                  </Button>
+                  <CartButton tenantSlug={tenantSlug} productId={productId} />
                   <Button
                     variant="elevated"
                     className="size-12"
-                    onClick={() => {}}
+                    onClick={() => { }}
                     disabled={false}
                   >
                     <LinkIcon className="size-4" />
@@ -139,7 +141,7 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                 </div>
 
                 <div className="grid grid-cols-[auto_1fr_auto] gap-3 mt-4 items-center">
-                  {[5,4,3,2,1].map((star) => (
+                  {[5, 4, 3, 2, 1].map((star) => (
                     <Fragment key={star}>
                       <div className="font-medium">{star} {star === 1 ? "star" : "stars"}</div>
 
@@ -152,7 +154,7 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                         {0}%
                       </div>
                     </Fragment>
-                  ) )}
+                  ))}
                 </div>
               </div>
 

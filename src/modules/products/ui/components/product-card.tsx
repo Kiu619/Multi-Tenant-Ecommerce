@@ -38,7 +38,7 @@ export const ProductCard = ({
     <Link href={`${generateTenantURL(tenantSlug)}/products/${id}`}>
       <div className="flex flex-col border rounded-md bg-white overflow-hidden h-full hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow duration-300">
         <div className="relative aspect-square">
-          <Image src={imageUrl || "/placeholder.png"} alt={name} fill className="object-cover" />
+          <Image src={imageUrl || "/placeholder.png"} alt={name} fill className="object-cover" priority sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         </div>
 
         <div className="p-4 border-y flex flex-col gap-3 flex-1">

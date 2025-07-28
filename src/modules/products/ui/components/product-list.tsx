@@ -30,12 +30,12 @@ export const ProductList = ({ category, tenantSlug, narrowView }: Props) => {
     },
     {
       getNextPageParam: (lastPage: any) => {
-        return lastPage.docs.length > 0 ? lastPage.nextPage : undefined
+        return lastPage?.docs?.length > 0 ? lastPage.nextPage : undefined
       }
     }
   ))
 
-  if (data.pages[0].docs.length === 0) {
+  if (data.pages[0]?.docs?.length === 0) {
     return (
       <div className="border border-black border-dashed p-8 flex flex-col gap-y-4 items-center justify-center bg-white w-full rounded-lg">
         <InboxIcon className="size-12 text-black" />
@@ -50,11 +50,11 @@ export const ProductList = ({ category, tenantSlug, narrowView }: Props) => {
         {(data as any)?.pages.flatMap((page: any) => page.docs).map((product: Product) => (
           <ProductCard
             key={product.id}
-            id={product.id}
-            name={product.name}
-            imageUrl={product.image?.url}
-            tenantSlug={product.tenant?.slug || 'Kiuu'}
-            tenantImageUrl={product.tenant?.image?.url || ''}
+            id={product?.id}
+            name={product?.name}
+            imageUrl={product?.image?.url}
+            tenantSlug={product?.tenant?.slug || 'Kiuu'}
+            tenantImageUrl={product?.tenant?.image?.url || ''}
             reviewRating={product?.reviewRating || 4.5}
             reviewCount={product?.reviewCount || 100}
             price={product?.price || 0}

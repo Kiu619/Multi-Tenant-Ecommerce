@@ -1,6 +1,6 @@
 import { DEFAULT_LIMIT } from "@/constants"
 import { productFiltersLoader } from "@/hooks/use-product-filters-server"
-import { ProductListView } from "@/modules/products/views/product-list-view"
+import { ProductListView } from "@/modules/products/ui/views/product-list-view"
 import { getQueryClient, trpc } from "@/trpc/server"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
 import type { SearchParams } from "nuqs/server"
