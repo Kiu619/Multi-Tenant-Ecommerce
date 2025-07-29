@@ -13,8 +13,7 @@ interface Props {
 export const CheckoutButton = ({ className, hideIfEmpty, tenantSlug }: Props) => {
   const cart = useCart(tenantSlug)
 
-  // Nếu chưa hydrated, hiển thị loading state
-  if (!cart.hasHydrated) {
+  if (!cart.productIds) {
     return (
       <Button
         disabled

@@ -6,22 +6,16 @@ interface TenantCart {
 }
 
 interface CartState {
-  // Thêm flag để track hydration
-  _hasHydrated: boolean
-  setHasHydrated: (state: boolean) => void
   tenantCarts: Record<string, TenantCart>
   addProductToCart: (tenantSlug: string, productId: string) => void
   removeProductFromCart: (tenantSlug: string, productId: string) => void
   clearCart: (tenantSlug: string) => void
   clearAllCarts: () => void
-  getCartByTenant: (tenantSlug: string) => string[]
 }
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set, get) => ({
-      _hasHydrated: false,
-      setHasHydrated: (state) => set({ _hasHydrated: state }),
+    (set) => ({
       tenantCarts: {},
       addProductToCart: (tenantSlug: string, productId: string) => {
         set((state) => {
@@ -60,16 +54,10 @@ export const useCartStore = create<CartState>()(
       clearAllCarts: () => {
         set({ tenantCarts: {} })
       },
-      getCartByTenant: (tenantSlug: string) => {
-        return get().tenantCarts[tenantSlug]?.productIds || []
-      },
     }),
     {
       name: "cart-storage",
-      storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true)
-      },
+      storage: createJSONStorage(() => localStorage)
     }
   )
 )
