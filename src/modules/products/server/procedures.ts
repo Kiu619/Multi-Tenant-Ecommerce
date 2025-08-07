@@ -5,6 +5,7 @@ import { Sort, Where } from "payload"
 import { z } from "zod"
 import { sortOptions } from "@/hooks/use-product-filters-server"
 import { DEFAULT_LIMIT } from "@/constants"
+import { headers as getHeader } from "next/headers"
 
 export const productsRouter = createTRPCRouter({
 
@@ -13,15 +14,48 @@ export const productsRouter = createTRPCRouter({
       id: z.string(),
     }))
     .query(async ({ ctx, input }) => {
+      const headers = await getHeader()
+      const session = await ctx.payload.auth({ headers })
+
       const product = await ctx.payload.findByID({ 
         collection: 'products', 
         id: input.id, 
         depth: 2
       })
+
+      let isPurchased = false
+
+      if (session?.user) {
+        const orders = await ctx.payload.find({
+          collection: 'orders',
+          pagination: false,
+          limit: 1,
+          where: {
+            and: [
+              {
+                user: {
+                  equals: session.user.id,
+                },
+              },
+              {
+                products: {
+                  equals: input.id,
+                },
+              }
+            ]
+          }
+        })
+
+        if (orders.docs.length > 0) {
+          isPurchased = true
+        }
+      }
+
       return {
         ...product,
         image: (product.image as Media | null),
-        tenant: product.tenant as Tenant & { image: Media | null }
+        tenant: product.tenant as Tenant & { image: Media | null },
+        isPurchased,
       }
     }),
 
