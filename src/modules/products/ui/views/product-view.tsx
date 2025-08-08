@@ -6,12 +6,13 @@ import { Progress } from "@/components/ui/progress"
 import { formatPrice, generateTenantURL } from "@/lib/utils"
 import { useTRPC } from "@/trpc/client"
 import { useSuspenseQuery } from "@tanstack/react-query"
-import { LinkIcon, PlusIcon, StarIcon } from "lucide-react"
+import { CheckIcon, LinkIcon, PlusIcon, StarIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { Fragment } from "react"
+import { Fragment, useState } from "react"
 // import { CartButton } from "../ui/components/cart-button"
 import dynamic from "next/dynamic"
+import { toast } from "sonner"
 
 const CartButton = dynamic(() => import("../components/cart-button")
   .then((mod) => mod.CartButton), {
@@ -25,6 +26,8 @@ interface ProductViewProps {
 }
 
 export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
+
+  const [isCopied, setIsCopied] = useState(false)
 
   const trcp = useTRPC()
   const { data: product } = useSuspenseQuery(trcp.products.getOne.queryOptions({ id: productId }))
@@ -78,17 +81,17 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
 
               <div className="hidden lg:flex px-6 py-4 items-center justify-center">
                 <div className="flex items-center gap-1">
-                  <StarRating rating={4} iconClassName="size-4" />
+                  <StarRating rating={product.reviewRating} iconClassName="size-4" />
                 </div>
               </div>
             </div>
 
             <div className="block lg:hidden px-6 -py-4 items-center justify-center border-b">
               <div className="flex items-center gap-1">
-                <StarRating rating={4} iconClassName="size-4" />
+                <StarRating rating={product.reviewRating} iconClassName="size-4" />
 
                 <p className="text-base font-medium">
-                  {4} ratings
+                  {product.reviewCount} ratings
                 </p>
               </div>
             </div>
@@ -119,10 +122,17 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                   <Button
                     variant="elevated"
                     className="size-12"
-                    onClick={() => { }}
-                    disabled={false}
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href)
+                      setIsCopied(true)
+                      toast.success("Copied to clipboard")
+                      setTimeout(() => {
+                        setIsCopied(false)
+                      }, 2000)
+                    }}
+                    disabled={isCopied}
                   >
-                    <LinkIcon className="size-4" />
+                    {isCopied ? <CheckIcon className="size-4" /> : <LinkIcon className="size-4" />}
                   </Button>
                 </div>
 
@@ -139,9 +149,9 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
 
                   <div className="flex items-center gap-x-1 font-medium">
                     <StarIcon className="size-4 fill-black" />
-                    <p>({4})</p>
+                    <p>({product.reviewCount})</p>
                     <p className="text-base">
-                      {4} ratings
+                      {product.reviewCount} ratings
                     </p>
                   </div>
                 </div>
@@ -152,12 +162,12 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                       <div className="font-medium">{star} {star === 1 ? "star" : "stars"}</div>
 
                       <Progress
-                        value={5}
+                        value={product.ratingDistribution[star]}
                         className="h-[1lh]"
                       />
 
                       <div className="font-medium">
-                        {0}%
+                        {product.ratingDistribution[star]}%
                       </div>
                     </Fragment>
                   ))}

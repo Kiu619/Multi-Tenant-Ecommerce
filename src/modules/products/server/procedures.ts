@@ -1,11 +1,11 @@
-import { Category, Category as CategoryType, Media, Tenant } from "@/payload-types"
+import { DEFAULT_LIMIT } from "@/constants"
+import { sortOptions } from "@/hooks/use-product-filters-server"
+import { Category, Media, Tenant } from "@/payload-types"
 import { baseProcedure, createTRPCRouter } from "@/trpc/init"
 import { CustomCategory } from "@/types"
+import { headers as getHeader } from "next/headers"
 import { Sort, Where } from "payload"
 import { z } from "zod"
-import { sortOptions } from "@/hooks/use-product-filters-server"
-import { DEFAULT_LIMIT } from "@/constants"
-import { headers as getHeader } from "next/headers"
 
 export const productsRouter = createTRPCRouter({
 
@@ -51,11 +51,52 @@ export const productsRouter = createTRPCRouter({
         }
       }
 
+      const reviews = await ctx.payload.find({
+        collection: 'reviews',
+        where: {
+          product: {
+            equals: input.id,
+          }
+        }
+      })
+
+      const reviewRating = 
+        reviews.docs.length > 0 ? reviews.docs.reduce((acc, review) => acc + (review.rating ?? 0), 0) / reviews.docs.length : 0
+
+      const ratingDistribution: Record<number, number> = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      }
+
+      if (reviews.totalDocs > 0) {
+        reviews.docs.forEach((review) => {
+          const rating = review.rating
+
+          if (rating >= 1 && rating <= 5) {
+            ratingDistribution[rating] = (ratingDistribution[rating] || 0) + 1
+          }
+        })
+
+        Object.keys(ratingDistribution).forEach((key) => {
+          const rating = Number(key)
+          
+          const count = ratingDistribution[rating] || 0
+          ratingDistribution[rating] = Math.round((count / reviews.totalDocs) * 100)
+        })
+      }
+      
+
       return {
         ...product,
         image: (product.image as Media | null),
         tenant: product.tenant as Tenant & { image: Media | null },
         isPurchased,
+        reviewRating,
+        reviewCount: reviews.totalDocs,
+        ratingDistribution,
       }
     }),
 
@@ -155,9 +196,28 @@ export const productsRouter = createTRPCRouter({
         limit: input.limit,
         page: input.cursor,
       })
+
+      const dataWithSummarizeReviews = await Promise.all(
+        data.docs.map(async (doc) => {
+          const reviews = await ctx.payload.find({
+            collection: 'reviews',
+            where: {
+              product: {
+                equals: doc.id,
+              }
+            }
+          })
+          return {
+            ...doc,
+            reviewCount: reviews.totalDocs,
+            reviewRating: reviews.docs.reduce((acc, review) => acc + (review.rating ?? 0), 0) / reviews.totalDocs,
+          }
+        })
+      )
+
       return {
         ...data,
-        docs: data.docs.map((doc) => ({
+        docs: dataWithSummarizeReviews.map((doc) => ({
           ...doc,
           imageUrl: (doc.image as Media | null),
           tenant: doc.tenant as Tenant & { image: Media | null }

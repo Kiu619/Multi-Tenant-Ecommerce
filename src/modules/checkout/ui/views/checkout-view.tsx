@@ -1,6 +1,6 @@
 "use client"
 
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTRPC } from "@/trpc/client"
 import { useCart } from "@/hooks/use-cart"
 import { useEffect } from "react"
@@ -11,6 +11,7 @@ import { CheckoutSidebar } from "../components/checkout-sidebar"
 import { InboxIcon, LoaderIcon } from "lucide-react"
 import { useCheckoutStates } from "@/hooks/use-checkout-states"
 import { useRouter } from "next/navigation"
+import { DEFAULT_LIMIT } from "@/constants"
 
 interface Props {
   tenantSlug: string
@@ -23,6 +24,8 @@ export const CheckoutView = ({ tenantSlug }: Props) => {
   const { productIds, removeProductFromCart, clearCart } = useCart(tenantSlug)
   const trpc = useTRPC()
   
+  const queryClient = useQueryClient()
+
   // Chỉ enable query sau khi đã hydrated và có productIds
   const { data: products, error, isLoading } = useQuery({
     ...trpc.checkout.getProducts.queryOptions({ ids: productIds || [] }),
@@ -54,9 +57,12 @@ export const CheckoutView = ({ tenantSlug }: Props) => {
         cancel: false,
       })
       clearCart()
-      router.push("products")
+      queryClient.invalidateQueries(trpc.library.getMany.infiniteQueryOptions({
+        limit: DEFAULT_LIMIT
+      }))
+      router.push("/library")
     }
-  }, [states.success])
+  }, [states.success, queryClient, router, trpc.library.getMany, clearCart, setStates])
 
   useEffect(() => {
     if (error?.data?.code === "NOT_FOUND") {
